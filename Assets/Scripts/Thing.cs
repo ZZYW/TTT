@@ -14,8 +14,6 @@ public class Thing : MonoBehaviour
         public float acceleration;
         public float drag;
         public float mass;
-        public float chatBubbleOffsetHeight;
-        public float getNewDestinationInterval;
         public int newDestinationRange;
         public bool alwaysFacingTarget;
         public Color myCubeColor;
@@ -26,9 +24,7 @@ public class Thing : MonoBehaviour
             cameraOffset = 15;
             acceleration = 4;
             drag = 1.8f;
-            mass = 20f;
-            chatBubbleOffsetHeight = 10;
-            getNewDestinationInterval = 5;
+            mass = 10f;
             newDestinationRange = 40;
             alwaysFacingTarget = true;
             neighborDetectorRadius = 10;
@@ -98,7 +94,7 @@ public class Thing : MonoBehaviour
         speakCD = new Cooldown(Random.Range(5f, 10f));
         playSoundCD = new Cooldown(1);
 
-  
+
         Instantiate(ResourceManager.main.sparkPSPrefab, transform, false);
 
 
@@ -116,7 +112,7 @@ public class Thing : MonoBehaviour
         //add essential part
         gameObject.AddComponent<MeshRenderer>();
         gameObject.AddComponent<MeshFilter>().mesh = ResourceManager.main.cubeMesh.mesh;
-        gameObject.AddComponent<AudioSource>();
+        audioSource = gameObject.AddComponent<AudioSource>();
         gameObject.AddComponent<BoxCollider>();
         var rb = gameObject.AddComponent<Rigidbody>();
 
@@ -136,13 +132,18 @@ public class Thing : MonoBehaviour
         explodePS = GetComponentInChildren<ParticleSystem>();
 
         //Sound
-        audioSource = gameObject.GetComponent<AudioSource>();
         audioSource.playOnAwake = false;
         audioSource.loop = false;
         audioSource.bypassListenerEffects = false;
         audioSource.spatialBlend = 1f;
-        audioSource.maxDistance = 35;
+        audioSource.maxDistance = 200;
         audioSource.dopplerLevel = 5;
+        audioSource.clip = ResourceManager.main.sound;
+       
+
+        //set its initial position
+        Vector3 initialPosition = new Vector3(Random.Range(-100, 100), 10, Random.Range(-100, 100));
+        transform.position = initialPosition;
 
         ThingStart();
 
@@ -353,45 +354,6 @@ public class Thing : MonoBehaviour
     protected void RandomSetDestination()
     {
         SetRandomTarget(settings.newDestinationRange);
-    }
-
-
-
-
-    private void AddCubeMesh()
-    {
-        Vector3[] vertices = {
-            new Vector3 (0, 0, 0),
-            new Vector3 (1, 0, 0),
-            new Vector3 (1, 1, 0),
-            new Vector3 (0, 1, 0),
-            new Vector3 (0, 1, 1),
-            new Vector3 (1, 1, 1),
-            new Vector3 (1, 0, 1),
-            new Vector3 (0, 0, 1),
-        };
-
-        int[] triangles = new int[]
-        {
-            3, 1, 0,        3, 2, 1,        // Bottom	
-	        7, 5, 4,        7, 6, 5,        // Left
-	        11, 9, 8,       11, 10, 9,      // Front
-	        15, 13, 12,     15, 14, 13,     // Back
-	        19, 17, 16,     19, 18, 17,	    // Right
-	        23, 21, 20,     23, 22, 21,	    // Top
-        };
-
-        Mesh mesh = gameObject.AddComponent<MeshFilter>().mesh;
-
-
-
-        mesh.Clear();
-        mesh.vertices = vertices;
-        mesh.triangles = triangles;
-        //  mesh.Optimize();
-        mesh.RecalculateNormals();
-        mesh.RecalculateBounds();
-        mesh.RecalculateTangents();
     }
 
     //VIRTUAL

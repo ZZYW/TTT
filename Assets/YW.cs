@@ -6,12 +6,9 @@ public class YW : Thing
 {
     protected override void ThingAwake()
     {
-        settings.cameraOffset = 15;
         settings.acceleration = 4;
         settings.drag = 1.8f;
-        settings.mass = 100f;
-        settings.chatBubbleOffsetHeight = 10;
-        settings.getNewDestinationInterval = 5;
+        settings.mass = 10f;
         settings.newDestinationRange = 40;
         settings.alwaysFacingTarget = true;
         settings.neighborDetectorRadius = 10;
@@ -21,7 +18,6 @@ public class YW : Thing
     {
         Speak("hey yo!");
         PlaySound();
-
     }
 
     protected override void ThingUpdate()
@@ -33,8 +29,7 @@ public class YW : Thing
     {
         Spark(Color.blue, 100);
         Speak("sad day..");
-      
-
+     
     }
 
     protected override void OnSunrise()
