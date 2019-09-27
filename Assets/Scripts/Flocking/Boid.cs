@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class Boid : MonoBehaviour
 {
     public Rigidbody rb;
@@ -15,7 +16,7 @@ public class Boid : MonoBehaviour
     void Start()
     {
 
-        rb = gameObject.AddComponent<Rigidbody>();
+        rb = host.GetComponent<Rigidbody>();
 
 
 
@@ -25,15 +26,12 @@ public class Boid : MonoBehaviour
 
         maxSpeed = 5;
         maxforce = 0.5f;
-
-        rb.mass = host.settings.mass;
-        rb.drag = host.settings.drag;
     }
 
 
 
     // We accumulate a new acceleration each time based on three rules
-    void flock(List<Boid> boids)
+    void Flock(List<Boid> boids)
     {
         Vector3 sep = Separate(boids);   // Separation
         Vector3 ali = Align(boids);      // Alignment
@@ -54,7 +52,7 @@ public class Boid : MonoBehaviour
     // Method to update transform.position
     void Update()
     {
-        flock(ThingManager.main.boids);
+        Flock(ThingManager.main.boids);
         rb.AddForce(finalForce);
 
         //limit max speed

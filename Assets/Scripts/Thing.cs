@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Events;
 
+
 public class Thing : MonoBehaviour
 {
 
@@ -12,8 +13,8 @@ public class Thing : MonoBehaviour
     {
         public int cameraOffset;
         public float acceleration;
-        public float drag;
-        public float mass;
+        //  public float drag;
+        // public float mass;
         public int newDestinationRange;
         public Color myCubeColor;
         public int neighborDetectorRadius;
@@ -22,8 +23,8 @@ public class Thing : MonoBehaviour
         {
             cameraOffset = 15;
             acceleration = 4;
-            drag = 1.8f;
-            mass = 10f;
+            //            drag = 1.8f;
+            //          mass = 10f;
             newDestinationRange = 40;
             neighborDetectorRadius = 10;
         }
@@ -53,7 +54,7 @@ public class Thing : MonoBehaviour
     bool stopTalking;
     Boid boid;
     SphereCollider neighborDetector;
-
+    new Rigidbody rigidbody;
     ParticleSystem explodePS;
     AudioSource audioSource;
     List<GameObject> neighborList;
@@ -92,7 +93,10 @@ public class Thing : MonoBehaviour
         speakCD = new Cooldown(Random.Range(5f, 10f));
         playSoundCD = new Cooldown(1);
 
-        
+        if (GetComponent<Rigidbody>() == null)
+        {
+            rigidbody = gameObject.AddComponent<Rigidbody>();
+        }
 
         MyName = gameObject.name;
         settings = new Settings();
@@ -109,18 +113,20 @@ public class Thing : MonoBehaviour
         gameObject.AddComponent<MeshFilter>().mesh = ResourceManager.main.cubeMesh.mesh;
         mMat = gameObject.AddComponent<MeshRenderer>().material;
 
+
+
         ThingAwake();
     }
 
     private void Start()
     {
 
-  
+
         //Sound
         audioSource.playOnAwake = false;
         audioSource.loop = false;
         audioSource.bypassListenerEffects = false;
-        audioSource.spatialBlend = 1f;
+        audioSource.spatialBlend = 0.8f;
         audioSource.maxDistance = 200;
         audioSource.dopplerLevel = 5;
         audioSource.clip = ResourceManager.main.sound;
@@ -140,6 +146,9 @@ public class Thing : MonoBehaviour
         //check cooldown
         speakCD.Check();
         playSoundCD.Check();
+
+        var scale = transform.localScale;
+        rigidbody.mass = scale.magnitude * 4;
 
 
         //check neighbors
@@ -288,14 +297,15 @@ public class Thing : MonoBehaviour
     {
         GameObject acube = GameObject.CreatePrimitive(PrimitiveType.Cube);
         acube.layer = 12;
-
-        acube.transform.localScale = Vector3.one / 4;
+        //set child scale
+        acube.transform.localScale = transform.localScale / 2; 
+        //set child position
         acube.transform.position = transform.position;
 
         if (generatedCubeContainer == null)
         {
             generatedCubeContainer = new GameObject();
-            generatedCubeContainer.name = MyName + "'s child";
+            generatedCubeContainer.name = "all children";
             generatedCubeContainer.AddComponent<ChildrenCounter>();
         }
 
