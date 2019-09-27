@@ -19,6 +19,14 @@ public class ChatBubbleManager : MonoBehaviour {
 		CameraSwitcher.OnCameraSwitch -= ChangeEventCamera;
 	}
 
+    public void Speak(Transform host, string content)
+    {
+        var newSpeech = Instantiate(chatBubblePrefab, Vector3.zero, Quaternion.identity).GetComponent<SimpleChatBubble>();
+        newSpeech.gameObject.transform.SetParent(transform);
+        newSpeech.Init(content, host);
+    }
+
+    /*
 	public void Init (int number) {
 		chatBubbleList = new List<SimpleChatBubble> ();
 		for (int i = 0; i < number; i++) {
@@ -26,7 +34,7 @@ public class ChatBubbleManager : MonoBehaviour {
 			GameObject nChatBubble = Instantiate (chatBubblePrefab, Vector3.zero, Quaternion.identity);
 			nChatBubble.transform.SetParent (transform, true);
 			//set host and offset position from things
-			GameObject targetThing = ThingManager.main.AllThings[i];
+			GameObject targetThing = ThingManager.main.things[i];
 			SimpleChatBubble simpleChatBubble = nChatBubble.GetComponent<SimpleChatBubble> ();
 
 			//set SimepleChatBubble vital references
@@ -40,6 +48,7 @@ public class ChatBubbleManager : MonoBehaviour {
 			chatBubbleList.Add (simpleChatBubble);
 		}
 	}
+    */
 
 	void ChangeEventCamera () {
 		GetComponent<Canvas> ().worldCamera = Camera.main;

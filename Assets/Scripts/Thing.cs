@@ -30,7 +30,7 @@ public class Thing : MonoBehaviour
         }
     }
 
-    public SimpleChatBubble myChatBubble;
+  //  public SimpleChatBubble myChatBubble;
     public Settings settings { get; protected set; }
 
 
@@ -152,7 +152,7 @@ public class Thing : MonoBehaviour
 
 
         //check neighbors
-        foreach (GameObject t in ThingManager.main.AllThings)
+        foreach (GameObject t in ThingManager.main.things)
         {
             float dist = Vector3.Distance(transform.position, t.transform.position);
             if (dist < settings.neighborDetectorRadius)
@@ -266,13 +266,13 @@ public class Thing : MonoBehaviour
 
     protected void Speak(string content)
     {
-        if (myChatBubble == null) return;
+     //   if (myChatBubble == null) return;
         if (stopTalking) return;
-        if (speakCD.inCD) return;
+    //    if (speakCD.inCD) return;
 
         TTTEventsManager.main.SomeoneSpoke(gameObject);
-        myChatBubble.Speak(content);
-        speakCD.GoCooldown();
+        ChatBubbleManager.main.Speak(transform, content);
+      //  speakCD.GoCooldown();
     }
 
     protected void Spark(Color particleColor, int numberOfParticles)

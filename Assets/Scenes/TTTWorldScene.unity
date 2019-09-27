@@ -419,7 +419,7 @@ GameObject:
   - component: {fileID: 500637097}
   - component: {fileID: 500637098}
   m_Layer: 0
-  m_Name: THING SPAWNER
+  m_Name: THING Manager
   m_TagString: Water
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1015,7 +1015,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &746510748
 MonoBehaviour:
   m_ObjectHideFlags: 0

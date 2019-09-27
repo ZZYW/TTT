@@ -6,39 +6,24 @@ using UnityEngine.UI;
 public class SimpleChatBubble : MonoBehaviour {
 
 	public Transform host;
-	//public Vector3 offsetPos;
 
 	[SerializeField] private Text text;
 	[SerializeField] private Image bubble;
 
-	// public Vector3 defaultOffsetPos;
 
-	void Start () {
-		Init ();
-	}
+    public void Init(string content, Transform host)
+    {
+        this.host = host;
+        text.text = content;
+        Invoke("SelfDestroy", 4f);
+    }
 
-	void Init () {
-		Disappear ();
-	}
-
-	void Update () {
+    void Update () {
 		transform.position = host.position + Vector3.up * host.localScale.y * 3;
 		transform.LookAt (CameraSwitcher.main.ActiveCam.position);
 	}
-
-	void OnDisable () {
-		CancelInvoke ();
-	}
-
-	public void Speak (string content) {
-		text.enabled = true;
-		bubble.enabled = true;
-		text.text = content;
-		Invoke ("Disappear", 2f);
-	}
-
-	void Disappear () {
-		text.enabled = false;
-		bubble.enabled = false;
+    
+	void SelfDestroy() {
+        Destroy(gameObject);
 	}
 }

@@ -22,30 +22,6 @@ public class UITextMemoryLeakBrutalSolver : MonoBehaviour {
 		InvokeRepeating ("DeleteAllCanvases", 120, 120);
 		// InvokeRepeating ("DestroyChatBubbles", ChatBubbleDestroyInterval, ChatBubbleDestroyInterval);
 	}
+    
 
-	void DeleteAllCanvases () {
-		// DestroyTTTConsole ();
-		DestroyChatBubbles ();
-	}
-
-	//tttconsole
-	// void DestroyTTTConsole () {
-	// 	Destroy (TTTConsoleGameobject);
-	// 	Invoke ("ReinstTConsole", TConsoleRebornWait);
-	// }
-
-	// void ReinstTConsole () {
-	// 	TTTConsoleGameobject = GameObject.Instantiate (TTTConsolePrefab, Vector3.zero, Quaternion.identity);
-	// }
-
-	//chatbubbles
-	void DestroyChatBubbles () {
-		Destroy (ChatBubbleCanvasGameobject);
-		Invoke ("ReInstChatBubbles", ChatbubbleRebornWait);
-	}
-
-	void ReInstChatBubbles () {
-		ChatBubbleCanvasGameobject = GameObject.Instantiate (ChatBubbleManagerPrefab, Vector3.zero, Quaternion.identity);
-		ChatBubbleCanvasGameobject.GetComponent<ChatBubbleManager> ().Init (ThingManager.main.AllThings.Count);
-	}
 }

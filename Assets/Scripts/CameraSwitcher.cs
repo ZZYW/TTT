@@ -28,7 +28,7 @@ public class CameraSwitcher : MonoBehaviour {
     void Start () {
         cameraFollowThing = followCam.GetComponent<CameraFollowThing> ();
 
-        allThings = ThingManager.main.AllThings;
+        allThings = ThingManager.main.things;
 
         if (allThings.Count < 1) return;
         AssignFollowTarget ();

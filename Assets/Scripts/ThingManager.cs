@@ -9,12 +9,12 @@ using UnityEngine.Audio;
 public class ThingManager : MonoBehaviour
 {
     public static ThingManager main;
-    public List<GameObject> AllThings;
+    public List<GameObject> things;
     public List<Boid> boids
     {
         get
         {
-            return AllThings.Select(item => item.GetComponent<Boid>()).ToList();
+            return things.Select(item => item.GetComponent<Boid>()).ToList();
         }
     }
 
@@ -25,11 +25,9 @@ public class ThingManager : MonoBehaviour
         var allThings = gameObject.GetComponentsInChildren<Thing>();
         foreach (Thing thing in allThings)
         {
-            AllThings.Add(thing.gameObject);
+            things.Add(thing.gameObject);
         }
 
-        //Instantiate chat bubble objects
-        ChatBubbleManager.main.Init(allThings.Length);
 
     }
 
