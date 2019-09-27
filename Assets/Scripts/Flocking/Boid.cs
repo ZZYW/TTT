@@ -5,29 +5,27 @@ using UnityEngine;
 
 public class Boid : MonoBehaviour
 {
+    public float sepWeight = 1;
+    public float aliWeight = 1;
+    public float cohWeight = 1;
     public Rigidbody rb;
-
-    public Thing host;
+    public Thing host;    
+    public float maxForce;    // Maximum steering force
+    public float maxSpeed;    // Maximum speed
 
     Vector3 finalForce;
-    float maxforce;    // Maximum steering force
-    float maxSpeed;    // Maximum speed
 
     void Start()
     {
-
         rb = host.GetComponent<Rigidbody>();
-
-
 
         //setup flocking parameters
         finalForce = new Vector3(0, 0);
-        rb.velocity = new Vector3(Random.Range(-1, 1), Random.Range(-1, 1));
+        rb.velocity = new Vector3(Random.Range(-1, 1), 0, Random.Range(-1, 1));
 
-        maxSpeed = 5;
-        maxforce = 0.5f;
+        maxSpeed = 10;
+        maxForce = 0.25f;
     }
-
 
 
     // We accumulate a new acceleration each time based on three rules
@@ -38,9 +36,9 @@ public class Boid : MonoBehaviour
         Vector3 coh = Cohesion(boids);   // Cohesion
 
         // Arbitrarily weight these forces
-        sep *= 1.5f;
-        ali *= 1.0f;
-        coh *= 1.0f;
+        sep *= sepWeight;
+        ali *= aliWeight;
+        coh *= cohWeight;
 
         // Add the force vectors to acceleration
         finalForce += sep;
@@ -76,7 +74,7 @@ public class Boid : MonoBehaviour
         desired *= maxSpeed;
         // Steering = Desired minus Velocity
         Vector3 steer = desired - rb.velocity;
-        while (steer.magnitude > maxforce)
+        while (steer.magnitude > maxForce)
         {
             steer *= 0.9f;
         }
@@ -119,7 +117,7 @@ public class Boid : MonoBehaviour
             steer.Normalize();
             steer *= maxSpeed;
             steer -= rb.velocity;
-            while (steer.magnitude > maxforce)
+            while (steer.magnitude > maxForce)
             {
                 steer *= 0.9f;
             }
@@ -151,7 +149,7 @@ public class Boid : MonoBehaviour
             sum.Normalize();
             sum *= maxSpeed;
             Vector3 steer = sum - rb.velocity;
-            while (steer.magnitude > maxforce)
+            while (steer.magnitude > maxForce)
             {
                 steer *= 0.9f;
             }

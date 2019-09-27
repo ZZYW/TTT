@@ -8,37 +8,13 @@ using UnityEngine.Events;
 
 public class Thing : MonoBehaviour
 {
-
-    public class Settings
-    {
-        public int cameraOffset;
-        public float acceleration;
-        //  public float drag;
-        // public float mass;
-        public int newDestinationRange;
-        public Color myCubeColor;
-        public int neighborDetectorRadius;
-
-        public Settings()
-        {
-            cameraOffset = 15;
-            acceleration = 4;
-            //            drag = 1.8f;
-            //          mass = 10f;
-            newDestinationRange = 40;
-            neighborDetectorRadius = 10;
-        }
-    }
-
-    //  public SimpleChatBubble myChatBubble;
-    public Settings settings { get; protected set; }
-
-
-
     protected bool InWater { get; private set; }
     protected int NeighborCount { get { return neighborList.Count; } }
     protected string MyName { get; private set; }
 
+    internal float DesiredFollowDistance { get; private set; }
+    internal float NeighborDistanceThreshold { get; private set; }
+    protected Boid boid { get; private set; }
     //cool down stuff to avoid crash
     Cooldown speakCD;
     Cooldown playSoundCD;
@@ -52,15 +28,13 @@ public class Thing : MonoBehaviour
 
     bool stopWalkingAround;
     bool stopTalking;
-    Boid boid;
+
     SphereCollider neighborDetector;
     new Rigidbody rigidbody;
     ParticleSystem explodePS;
     AudioSource audioSource;
     List<GameObject> neighborList;
 
-    static string soundFilePath = "Sounds/";
-    static string matColor = "_Color";
     static GameObject generatedCubeContainer;
     static string thingTag = "Thing";
 
@@ -68,8 +42,6 @@ public class Thing : MonoBehaviour
     StringBuilder stringBuilder;
 
     Material mMat;
-
-    public int DesiredFollowDistance { get { return settings.cameraOffset; } }
 
     private void OnEnable()
     {
@@ -90,8 +62,10 @@ public class Thing : MonoBehaviour
 
     private void Awake()
     {
-        speakCD = new Cooldown(Random.Range(5f, 10f));
-        playSoundCD = new Cooldown(1);
+        speakCD = new Cooldown(2);
+        playSoundCD = new Cooldown(2);
+        DesiredFollowDistance = 10;
+        NeighborDistanceThreshold = 10;
 
         if (GetComponent<Rigidbody>() == null)
         {
@@ -99,7 +73,6 @@ public class Thing : MonoBehaviour
         }
 
         MyName = gameObject.name;
-        settings = new Settings();
         stringBuilder = new StringBuilder();
         gameObject.tag = thingTag;
         gameObject.layer = 14;
@@ -112,8 +85,7 @@ public class Thing : MonoBehaviour
         boid.host = this;
         gameObject.SafeAddComponent<MeshFilter>().mesh = ResourceManager.main.cubeMesh.mesh;
         mMat = gameObject.SafeAddComponent<MeshRenderer>().material;
-
-
+        originalColor = mMat.GetColor("_Color");
 
         ThingAwake();
     }
@@ -126,7 +98,8 @@ public class Thing : MonoBehaviour
         audioSource.playOnAwake = false;
         audioSource.loop = false;
         audioSource.bypassListenerEffects = false;
-        audioSource.spatialBlend = 0f;
+
+        audioSource.spatialBlend = 0.9f;
         audioSource.maxDistance = 200;
         audioSource.dopplerLevel = 5;
         audioSource.clip = ResourceManager.main.sound;
@@ -155,7 +128,7 @@ public class Thing : MonoBehaviour
         foreach (GameObject t in ThingManager.main.things)
         {
             float dist = Vector3.Distance(transform.position, t.transform.position);
-            if (dist < settings.neighborDetectorRadius)
+            if (dist < NeighborDistanceThreshold)
             {
                 if (!neighborList.Contains(t))
                 {
@@ -215,12 +188,22 @@ public class Thing : MonoBehaviour
         OnLeaveWater();
     }
 
-    protected void SetTarget(Vector3 target)
+    protected void SetCohesionWeight(float cohesionWeight)
     {
-        if (!stopWalkingAround)
-        {
-            // boid.SetTarget(target);
-        }
+        boid.cohWeight = cohesionWeight;
+    }
+    protected void SetSeperationWeight(float separationWeight)
+    {
+        boid.sepWeight = separationWeight;
+    }
+    protected void SetAlignmentWeight(float alignmentWeight)
+    {
+        boid.aliWeight = alignmentWeight;
+    }
+
+    protected void SetMaxSpeed(float maxSpeed)
+    {
+        boid.maxSpeed = maxSpeed;
     }
 
     protected void StopMoving()
@@ -248,12 +231,7 @@ public class Thing : MonoBehaviour
     {
         stopWalkingAround = false;
     }
-
-    protected void SetRandomTarget(float area)
-    {
-        SetTarget(new Vector3(Random.Range(-area, area), 0, Random.Range(-area, area)));
-    }
-
+   
     protected void AddForce(Vector3 f)
     {
         boid.rb.AddForce(f);
@@ -268,6 +246,7 @@ public class Thing : MonoBehaviour
     {
         if (stopTalking) return;
         if (speakCD.inCD) return;
+        PlaySound();
         TTTEventsManager.main.SomeoneSpoke(gameObject);
         ChatBubbleManager.main.Speak(transform, content);
         speakCD.GoCooldown();
@@ -291,11 +270,17 @@ public class Thing : MonoBehaviour
 
     }
 
-    protected void CreateChildren()
+    protected void CreateChild()
     {
-        GameObject newborne = new GameObject(MyName+"'s copy");
-        newborne.GetComponent<Renderer>().material = mMat;
-        
+        GameObject newborne = new GameObject(MyName + "'s copy");
+        newborne.transform.position = transform.position + Vector3.down;
+        newborne.SafeAddComponent<Rigidbody>();
+        newborne.SafeAddComponent<BoxCollider>();
+        var mf = newborne.SafeAddComponent<MeshFilter>();
+        mf.mesh = transform.GetComponent<MeshFilter>().sharedMesh;
+        var rend = newborne.SafeAddComponent<MeshRenderer>();
+        rend.sharedMaterial = mMat;
+
         //set child scale
         newborne.transform.localScale = transform.localScale / 2;
 
@@ -319,10 +304,10 @@ public class Thing : MonoBehaviour
     protected void ChangeColor(Color c)
     {
         if (mMat == null) return;
-        mMat.SetColor(matColor, c);
+        mMat.SetColor("_Color", c);
     }
 
-    protected void PlaySound()
+    private void PlaySound()
     {
         if (playSoundCD.inCD) return;
         playSoundCD.GoCooldown();
@@ -336,11 +321,6 @@ public class Thing : MonoBehaviour
     protected Boid GetBoid()
     {
         return boid;
-    }
-
-    protected void RandomSetDestination()
-    {
-        SetRandomTarget(settings.newDestinationRange);
     }
 
     //VIRTUAL
