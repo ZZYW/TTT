@@ -12,7 +12,7 @@
 
      if you absolutely do not want to download&install anything, you can use the built-in Notebook(windows) or TextEdit(mac). they just won't highlight syntax for you, thus a bit more easier to make syntax mistakes.
 
-2. Download the template script
+2. Download the [template script](https://gist.githubusercontent.com/wangyangwang/bb78837008a36031d3bd1cfea3bee8f7/raw/cbc5a881008aba08635ce3333616ebd6672ce2bf/Foo.cs)
 
 3. Change the class's name AND the file name, make sure they are exactly the same.
    
