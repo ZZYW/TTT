@@ -10,8 +10,12 @@ public class YW : Thing
         settings.drag = 1.8f;
         settings.mass = 10f;
         settings.newDestinationRange = 40;
-        settings.alwaysFacingTarget = true;
         settings.neighborDetectorRadius = 10;
+    
+        //scale parameters: width, height and depth
+        SetScale(new Vector3(2, 4, 2));
+        //color parameters: Red, Green, BLue -- 0 means NO, 1 means FULL
+        ChangeColor(new Color(1, 0, 0));
     }
 
     protected override void ThingStart()

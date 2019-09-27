@@ -15,7 +15,6 @@ public class Thing : MonoBehaviour
         public float drag;
         public float mass;
         public int newDestinationRange;
-        public bool alwaysFacingTarget;
         public Color myCubeColor;
         public int neighborDetectorRadius;
 
@@ -26,7 +25,6 @@ public class Thing : MonoBehaviour
             drag = 1.8f;
             mass = 10f;
             newDestinationRange = 40;
-            alwaysFacingTarget = true;
             neighborDetectorRadius = 10;
         }
     }
@@ -53,7 +51,7 @@ public class Thing : MonoBehaviour
 
     bool stopWalkingAround;
     bool stopTalking;
-    ThingMotor motor;
+    Boid boid;
     SphereCollider neighborDetector;
 
     ParticleSystem explodePS;
@@ -94,9 +92,7 @@ public class Thing : MonoBehaviour
         speakCD = new Cooldown(Random.Range(5f, 10f));
         playSoundCD = new Cooldown(1);
 
-
-        Instantiate(ResourceManager.main.sparkPSPrefab, transform, false);
-
+        
 
         MyName = gameObject.name;
         settings = new Settings();
@@ -104,33 +100,22 @@ public class Thing : MonoBehaviour
         gameObject.tag = thingTag;
         gameObject.layer = 14;
         neighborList = new List<GameObject>();
+
+        explodePS = Instantiate(ResourceManager.main.sparkPSPrefab, transform, false).GetComponent<ParticleSystem>();
+        audioSource = gameObject.AddComponent<AudioSource>();
+        gameObject.AddComponent<BoxCollider>();
+        boid = gameObject.AddComponent<Boid>();
+        boid.host = this;
+        gameObject.AddComponent<MeshFilter>().mesh = ResourceManager.main.cubeMesh.mesh;
+        mMat = gameObject.AddComponent<MeshRenderer>().material;
+
         ThingAwake();
     }
 
     private void Start()
     {
-        //add essential part
-        gameObject.AddComponent<MeshRenderer>();
-        gameObject.AddComponent<MeshFilter>().mesh = ResourceManager.main.cubeMesh.mesh;
-        audioSource = gameObject.AddComponent<AudioSource>();
-        gameObject.AddComponent<BoxCollider>();
-        var rb = gameObject.AddComponent<Rigidbody>();
 
-
-        //get the material
-        mMat = GetComponent<Renderer>().material;
-
-
-        //motor
-        motor = gameObject.AddComponent<ThingMotor>();
-        motor.SetAccel(settings.acceleration * 4);
-        motor.rb.drag = settings.drag;
-        motor.rb.mass = settings.mass;
-        motor.FacingTarget(settings.alwaysFacingTarget);
-
-        //Instantiating Particle Object
-        explodePS = GetComponentInChildren<ParticleSystem>();
-
+  
         //Sound
         audioSource.playOnAwake = false;
         audioSource.loop = false;
@@ -139,7 +124,7 @@ public class Thing : MonoBehaviour
         audioSource.maxDistance = 200;
         audioSource.dopplerLevel = 5;
         audioSource.clip = ResourceManager.main.sound;
-       
+
 
         //set its initial position
         Vector3 initialPosition = new Vector3(Random.Range(-100, 100), 10, Random.Range(-100, 100));
@@ -225,14 +210,13 @@ public class Thing : MonoBehaviour
     {
         if (!stopWalkingAround)
         {
-            motor.SetTarget(target);
+            // boid.SetTarget(target);
         }
     }
 
     protected void StopMoving()
     {
-        stopWalkingAround = true;
-        motor.Stop();
+        //todo
     }
 
     protected void StopMoving(float seconds)
@@ -263,7 +247,7 @@ public class Thing : MonoBehaviour
 
     protected void AddForce(Vector3 f)
     {
-        motor.rb.AddForce(f);
+        boid.rb.AddForce(f);
     }
 
     protected void SetScale(Vector3 newScale)
@@ -346,9 +330,9 @@ public class Thing : MonoBehaviour
         }
     }
 
-    protected ThingMotor GetMotor()
+    protected Boid GetBoid()
     {
-        return motor;
+        return boid;
     }
 
     protected void RandomSetDestination()
