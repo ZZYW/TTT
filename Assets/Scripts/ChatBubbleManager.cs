@@ -26,30 +26,6 @@ public class ChatBubbleManager : MonoBehaviour {
         newSpeech.Init(content, host);
     }
 
-    /*
-	public void Init (int number) {
-		chatBubbleList = new List<SimpleChatBubble> ();
-		for (int i = 0; i < number; i++) {
-			//create a new chatbublle from prefab
-			GameObject nChatBubble = Instantiate (chatBubblePrefab, Vector3.zero, Quaternion.identity);
-			nChatBubble.transform.SetParent (transform, true);
-			//set host and offset position from things
-			GameObject targetThing = ThingManager.main.things[i];
-			SimpleChatBubble simpleChatBubble = nChatBubble.GetComponent<SimpleChatBubble> ();
-
-			//set SimepleChatBubble vital references
-			simpleChatBubble.host = targetThing.transform;
-     
-
-			//link chatbubble with thing
-			targetThing.GetComponent<Thing> ().myChatBubble = simpleChatBubble;
-
-			//add this chatbubble to list
-			chatBubbleList.Add (simpleChatBubble);
-		}
-	}
-    */
-
 	void ChangeEventCamera () {
 		GetComponent<Canvas> ().worldCamera = Camera.main;
 	}
