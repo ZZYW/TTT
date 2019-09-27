@@ -30,7 +30,7 @@ public class Thing : MonoBehaviour
         }
     }
 
-  //  public SimpleChatBubble myChatBubble;
+    //  public SimpleChatBubble myChatBubble;
     public Settings settings { get; protected set; }
 
 
@@ -95,7 +95,7 @@ public class Thing : MonoBehaviour
 
         if (GetComponent<Rigidbody>() == null)
         {
-            rigidbody = gameObject.AddComponent<Rigidbody>();
+            rigidbody = gameObject.SafeAddComponent<Rigidbody>();
         }
 
         MyName = gameObject.name;
@@ -106,12 +106,12 @@ public class Thing : MonoBehaviour
         neighborList = new List<GameObject>();
 
         explodePS = Instantiate(ResourceManager.main.sparkPSPrefab, transform, false).GetComponent<ParticleSystem>();
-        audioSource = gameObject.AddComponent<AudioSource>();
-        gameObject.AddComponent<BoxCollider>();
-        boid = gameObject.AddComponent<Boid>();
+        audioSource = gameObject.SafeAddComponent<AudioSource>();
+        gameObject.SafeAddComponent<BoxCollider>();
+        boid = gameObject.SafeAddComponent<Boid>();
         boid.host = this;
-        gameObject.AddComponent<MeshFilter>().mesh = ResourceManager.main.cubeMesh.mesh;
-        mMat = gameObject.AddComponent<MeshRenderer>().material;
+        gameObject.SafeAddComponent<MeshFilter>().mesh = ResourceManager.main.cubeMesh.mesh;
+        mMat = gameObject.SafeAddComponent<MeshRenderer>().material;
 
 
 
@@ -126,7 +126,7 @@ public class Thing : MonoBehaviour
         audioSource.playOnAwake = false;
         audioSource.loop = false;
         audioSource.bypassListenerEffects = false;
-        audioSource.spatialBlend = 0.8f;
+        audioSource.spatialBlend = 0f;
         audioSource.maxDistance = 200;
         audioSource.dopplerLevel = 5;
         audioSource.clip = ResourceManager.main.sound;
@@ -266,13 +266,11 @@ public class Thing : MonoBehaviour
 
     protected void Speak(string content)
     {
-     //   if (myChatBubble == null) return;
         if (stopTalking) return;
-    //    if (speakCD.inCD) return;
-
+        if (speakCD.inCD) return;
         TTTEventsManager.main.SomeoneSpoke(gameObject);
         ChatBubbleManager.main.Speak(transform, content);
-      //  speakCD.GoCooldown();
+        speakCD.GoCooldown();
     }
 
     protected void Spark(Color particleColor, int numberOfParticles)
@@ -295,26 +293,21 @@ public class Thing : MonoBehaviour
 
     protected void CreateChildren()
     {
-        GameObject acube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        acube.layer = 12;
+        GameObject newborne = new GameObject(MyName+"'s copy");
+        newborne.GetComponent<Renderer>().material = mMat;
+        
         //set child scale
-        acube.transform.localScale = transform.localScale / 2; 
-        //set child position
-        acube.transform.position = transform.position;
+        newborne.transform.localScale = transform.localScale / 2;
 
         if (generatedCubeContainer == null)
         {
             generatedCubeContainer = new GameObject();
             generatedCubeContainer.name = "all children";
-            generatedCubeContainer.AddComponent<ChildrenCounter>();
+            generatedCubeContainer.SafeAddComponent<ChildrenCounter>();
         }
 
-        acube.transform.parent = generatedCubeContainer.transform;
-        generatedCubeContainer.GetComponent<ChildrenCounter>().list.Add(acube);
-
-        acube.AddComponent<Rigidbody>();
-        acube.AddComponent<ProducedCube>().Init(settings.myCubeColor);
-
+        newborne.transform.parent = generatedCubeContainer.transform;
+        generatedCubeContainer.GetComponent<ChildrenCounter>().list.Add(newborne);
     }
 
     protected void ResetColor()
@@ -363,4 +356,30 @@ public class Thing : MonoBehaviour
     protected virtual void OnSunset() { }
     protected virtual void OnSunrise() { }
 
+
+
+
+}
+
+
+//It is common to create a class to contain all of your
+//extension methods. This class must be static.
+public static class ExtensionMethods
+{
+    //Even though they are used like normal methods, extension
+    //methods must be declared static. Notice that the first
+    //parameter has the 'this' keyword followed by a Transform
+    //variable. This variable denotes which class the extension
+    //method becomes a part of.
+    public static T SafeAddComponent<T>(this GameObject me) where T : Component
+    {
+        if (me.GetComponent<T>() != null)
+        {
+            return me.GetComponent<T>();
+        }
+        else
+        {
+            return me.AddComponent<T>();
+        }
+    }
 }

@@ -13,13 +13,14 @@ public class YW : Thing
         //scale parameters: width, height and depth
         SetScale(new Vector3(Random.Range(1,3), Random.Range(1,3), Random.Range(1,3)));
         //color parameters: Red, Green, BLue -- 0 means NO, 1 means FULL
-        ChangeColor(new Color(1, 0, 0));
+        ChangeColor(new Color(1, 0, 1));
     }
 
     protected override void ThingStart()
     {
         Speak("hey yo!");
         PlaySound();
+    
     }
 
     protected override void ThingUpdate()
@@ -30,7 +31,8 @@ public class YW : Thing
     protected override void OnSunset()
     {
         Spark(Color.blue, 100);
-        Speak("sad day..");
+        //Speak("sad day..");
+        CreateChildren();
      
     }
 

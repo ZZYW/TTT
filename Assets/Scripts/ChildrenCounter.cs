@@ -6,7 +6,7 @@ public class ChildrenCounter : MonoBehaviour {
 
 	//TODO: children number control
 	public int ChildrenNumber;
-	public int maxChildrenNumber = 500;
+	public int maxChildrenNumber = 100;
 
 	public List<GameObject> list;
 
