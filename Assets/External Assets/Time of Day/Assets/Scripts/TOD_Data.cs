@@ -40,7 +40,6 @@ public class TOD_Data : MonoBehaviour {
         sky = GetComponent<TOD_Sky> ();
         IsDay = true;
         IsNight = false;
-        stringBuilder = new StringBuilder ();
     }
 
     // Update is called once per frame
@@ -50,7 +49,6 @@ public class TOD_Data : MonoBehaviour {
         if (hour > 19f && hour < 19.2f && !sunsetReported) {
             print ("------Sunset------");
             if (OnSunset != null) OnSunset ();
-            ThingConsole.LogWarning ("Sunset");
             sunsetReported = true;
             IsDay = false;
             IsNight = true;
@@ -60,16 +58,12 @@ public class TOD_Data : MonoBehaviour {
         if (hour > 7f && hour < 7.2f && !sunriseReported) {
             print ("------Sunrise------");
             if (OnSunrise != null) OnSunrise ();
-            ThingConsole.LogWarning ("Sunrise");
             IsDay = true;
             IsNight = false;
             sunriseReported = true;
             Invoke ("ResetSunriseReportFlag", reportCoolDown);
         }
 
-        stringBuilder.Length = 0;
-        stringBuilder.AppendFormat ("\n\n{0}", sky.Cycle.DateTime.TimeOfDay.ToString ());
-        timeText.text = stringBuilder.ToString ();
 
     }
 
